@@ -16,6 +16,7 @@ void fifo_enqueue(struct fifo *f, struct node *g)
         return;
     if (f->head != NULL)
     {
+        f->size += 1;
         struct elt *cur = f->head;
         while (cur->next != NULL)
             cur = cur->next;
@@ -26,6 +27,7 @@ void fifo_enqueue(struct fifo *f, struct node *g)
         f->head = malloc(sizeof(struct elt));
         f->head->data = g;
         f->head->next = NULL;
+        f->size++;
     }
 }
 
@@ -37,6 +39,7 @@ struct node *fifo_dequeue(struct fifo *f)
     {
         struct node *g = f->head->data;
         f->head = f->head->next;
+        f->size--;
         return g;
     }
     return NULL;
@@ -44,7 +47,7 @@ struct node *fifo_dequeue(struct fifo *f)
 
 size_t fifo_empty(struct fifo *f)
 {
-    if (f == NULL)
-        return 0;
+    if (f == NULL || f->head == NULL)
+        return 1;
     return f->size;
 }

@@ -1,6 +1,7 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 #include <stdlib.h>
+#include <limits.h>
 
 /*struct info
 {
@@ -9,18 +10,18 @@
 
 struct edge
 {
-    size_t weight:16;
+    size_t weight;
     struct node *next;
 };
 
 struct node
 {
-    size_t distance:16;
+    size_t distance;
     char *name;
     //struct info data;
-    int marked:1;
-    size_t len_neighbors:4;
-    struct edge *neighbors[0];
+    unsigned int marked;
+    size_t len_neighbors;
+    struct edge *neighbors[INT_MAX];
     struct node *daddy;
 };
 

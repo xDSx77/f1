@@ -4,7 +4,7 @@
 #include "fifo.h"
 #include "graph.h"
 
-void *bfs(struct node *g)
+void bfs(struct node *g)
 {
     struct fifo *f = fifo_init();
     fifo_enqueue(f, g);
@@ -16,7 +16,14 @@ void *bfs(struct node *g)
         g-> marked = 1;
         for (size_t i = 0; i < g->len_neighbors; i++)
         {
-            if (g->distance + g->neighbors[i]->weight <= g->neighbors[i]->next
+            if (g->distance + g->neighbors[i]->weight <=
+                g->neighbors[i]->next->distance)
+            {
+                g->neighbors[i]->next->distance = g->distance
+                    + g->distance + g->neighbors[i]->next->distance;
+                g->neighbors[i]->next->daddy = g;
+            }
+            fifo_enqueue(f, g->neighbors[i]->next);
         }
     }
 }

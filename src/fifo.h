@@ -10,7 +10,7 @@ struct elt
 
 struct fifo
 {
-    size_t size:16;
+    size_t size;
     struct elt *head;
 };
 
