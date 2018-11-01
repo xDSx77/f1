@@ -1,0 +1,12 @@
+# f1
+
+The Formula-One project, Epita, 30/10/18 - 09/11/18
+
+A project which consist in finding the finish line of a map without knowing where it is and 
+moving the car from the beginning to this line. There are different types of block on the map: 
+grass, road, water, wall. We must find the way which is the less costly (A* or Dijkstra algortihm
+for example) between these two points. Of course, the car has to go to the finish line as quickly 
+as possible.
+
+Explanations of the different functions present in the source files:
+
