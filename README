@@ -2,11 +2,25 @@
 
 The Formula-One project, Epita, 30/10/18 - 09/11/18
 
-A project which consist in finding the finish line of a map without knowing where it is and 
-moving the car from the beginning to this line. There are different types of block on the map: 
-grass, road, water, wall. We must find the way which is the less costly (A* or Dijkstra algortihm
-for example) between these two points. Of course, the car has to go to the finish line as quickly 
-as possible.
+A project which consist in finding the finish line of a map without knowing
+where it is and moving the car from the beginning to this line.
+There are different types of block on the map: grass, road, water, wall.
+We must find the way which is the less costly (A* or Dijkstra algortihm for
+example) between these two points. Of course, the car has to go to the
+finish line as quickly as possible.
 
 Explanations of the different functions present in the source files:
 
+fifo.c:
+
+- fifo_init : generate the fifo (first in, first out) which will be necessary
+  to create the graph and to contain its nodes.
+- fifo_enqueue : add a node in the fifo.
+- fifo_dequeue : remove a node from the fifo.
+- fifo_empty : test if the fifo is empty (return 0 if empty or the size of the
+  fifo if it's not empty)
+
+parse_map.c:
+
+- map_get_finish_x : find the absciss of the finish line
+- map_get_finish_y : find the ordinate of the finish line
