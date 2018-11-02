@@ -48,6 +48,6 @@ struct node *fifo_dequeue(struct fifo *f)
 size_t fifo_empty(struct fifo *f)
 {
     if (f == NULL || f->head == NULL)
-        return 1;
+        return 0;
     return f->size;
 }

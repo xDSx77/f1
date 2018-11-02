@@ -21,7 +21,7 @@ struct node
     //struct info data;
     unsigned int marked;
     size_t len_neighbors;
-    struct edge *neighbors[INT_MAX];
+    struct edge *neighbors[100];
     struct node *daddy;
 };
 
