@@ -1,28 +1,37 @@
-#ifndef GRAPH_H
-#define GRAPH_H
-#include <stdlib.h>
-#include <limits.h>
+#ifndef GRAPH_H_
+#define GRAPH_H_
+#include "control.h"
 
-/*struct info
+enum marked
 {
-    int marked:1;
-};*/
-
-struct edge
-{
-    size_t weight;
-    struct node *next;
+    UNSEEN,
+    DONE,
 };
 
-struct node
+struct coord2_t
 {
-    size_t distance;
-    char *name;
-    //struct info data;
-    unsigned int marked;
-    size_t len_neighbors;
-    struct edge *neighbors[100];
-    struct node *daddy;
+    int x;
+    int y;
 };
 
-#endif /* ! GRAPH_H */
+struct node_t
+{
+    char label;
+    struct coord2_t coord;
+    float weights[8];
+    enum marked state;
+};
+
+struct graph_t
+{
+    struct node_t *nodes;
+    int width;
+    int height;
+};
+
+struct graph_t graph_create(int width, int height);
+void graph_destroy(struct graph_t *g);
+//void graph_print(struct graph_t *g, struct coord2_t pos);
+struct graph_t *graph_create2(struct graph_t *g, struct map *map);
+
+#endif /* ! GRAPH_H_ */

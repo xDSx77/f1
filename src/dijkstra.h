@@ -1,16 +1,7 @@
-#include "control.h"
 #ifndef DIJKSTRA_H
 #define DIJKSTRA_H
+#include "graph.h"
 
-struct coor
-{
-    int x;
-    int y;
-};
-
-struct coor **create_graph(struct map *map);
-int **create_adj(struct coor **G, struct map *map);
-struct vector2 get_start(float x, float y);
-void dijkstra(struct vector2 **adj, int height, int width, struct vector2 start);
+struct vector2 *dijkstra(struct graph_t *g, float start_x, float start_y);
 
 #endif /* ! DIJKSTRA_H */

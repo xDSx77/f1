@@ -1,33 +1,9 @@
-#include <stdio.h>
+#include <stdio.h> //TODO remove
 #include <math.h>
 #include "control.h"
-#include "fifo.h"
-#include "graph.h"
+//#include "fifo.h"
+//#include "graph.h"
 #include "parse_map.h"
-
-void bfs(struct node *g)
-{
-    struct fifo *f = fifo_init();
-    fifo_enqueue(f, g);
-    while (!fifo_empty(f))
-    {
-        g = fifo_dequeue(f);
-        if (g->marked == 1)
-            continue;
-        g-> marked = 1;
-        for (size_t i = 0; i < g->len_neighbors; i++)
-        {
-            if (g->distance + g->neighbors[i]->weight <=
-                g->neighbors[i]->next->distance)
-            {
-                g->neighbors[i]->next->distance = g->distance
-                    + g->distance + g->neighbors[i]->next->distance;
-                g->neighbors[i]->next->daddy = g;
-            }
-            fifo_enqueue(f, g->neighbors[i]->next);
-        }
-    }
-}
 
 enum move update(struct car *car)
 {
@@ -54,7 +30,7 @@ enum move update(struct car *car)
     if (finish_y <= start_y)
         angle_trajectory = 180.0f - atanf(SF_y / SF_x) * (360.0f)/(2.0f * M_PI);
     else
-        angle_trajectory = 180.0f + atanf(SF_y / SF_x) * (380.0f)/(2.0f * M_PI);
+        angle_trajectory = 180.0f + atanf(SF_y / SF_x) * (360.0f)/(2.0f * M_PI);
     printf("angle trajectory: %f\n", angle_trajectory);
 
     float angle_rad;
@@ -80,9 +56,9 @@ enum move update(struct car *car)
     printf("finish x: %f\n", finish_x);
     printf("finish y: %f\n\n", finish_y);
     printf("-----------------\n\n");
-    if (angle_diff > 0.5f)
+    if (angle_diff > 0.4f)
         return TURN_RIGHT;
-    if (angle_diff < -0.5f)
+    if (angle_diff < -0.4f)
         return TURN_LEFT;
 
     //if (speed < 0.05f)

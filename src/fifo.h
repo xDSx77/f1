@@ -1,10 +1,11 @@
-#ifndef FIFO_H
-#define FIFO_H
+#ifndef FIFO_H_
+#define FIFO_H_
+#include <stdlib.h>
 #include "graph.h"
 
 struct elt
 {
-    struct node *data;
+    struct node_t *node;
     struct elt *next;
 };
 
@@ -15,8 +16,9 @@ struct fifo
 };
 
 struct fifo *fifo_init(void);
-void fifo_enqueue(struct fifo *f, struct node *g);
-struct node *fifo_dequeue(struct fifo *f);
+void fifo_enqueue(struct fifo *f, struct node_t *node);
+struct node_t *fifo_dequeue(struct fifo *f);
 size_t fifo_empty(struct fifo *f);
+void bfs(struct node_t *node, struct graph_t *g);
 
-#endif /* ! FIFO_H */
+#endif /* ! FIFO_H_ */
