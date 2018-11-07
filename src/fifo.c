@@ -2,7 +2,7 @@
 #include <math.h>
 #include "fifo.h"
 
-static struct coord2_t neighbors[8] =
+/*static struct coord2_t neighbors[8] =
 {
     {-1, -1},
     {0, -1},
@@ -12,7 +12,7 @@ static struct coord2_t neighbors[8] =
     {-1, 1},
     {0, 1},
     {1, 1}
-};
+};*/
 
 struct fifo *fifo_init(void)
 {
@@ -65,7 +65,7 @@ size_t fifo_empty(struct fifo *f)
         return 0;
     return f->size;
 }
-
+/*
 void bfs(struct node_t *node, struct graph_t *g)
 {
     struct fifo *f = fifo_init();
@@ -99,4 +99,4 @@ void bfs(struct node_t *node, struct graph_t *g)
             }
         }
     }
-}
+}*/

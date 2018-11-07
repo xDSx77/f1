@@ -1,33 +1,126 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h> //TODO remove
+#include <limits.h>
+#include "control.h"
+#include "parse_map.h"
 #include "graph.h"
 
-static struct coord2_t neighbors[8] =
+static struct coord2_t neighbors[4] =
 {
-    {-1, -1},
     {0, -1},
-    {1, -1},
     {-1, 0},
     {1, 0},
-    {-1, 1},
     {0, 1},
-    {1, 1}
 };
 
-struct graph_t graph_create(int width, int height)
+void graph_init(struct graph_t *g, struct map *map)
 {
-    struct graph_t g;
-    g.width = width;
-    g.height = height;
-    g.nodes = malloc(width * height * sizeof(struct node_t));
-    if (g.nodes == NULL)
-        return g;
-
-    struct node_t *cur = g.nodes;
-    for (int y = 0; y < height; y++)
+    struct node_t *cur = g->nodes;
+    for (int y = 0; y < g->height; y++)
     {
-        for (int x = 0; x < width; x++)
+        for (int x = 0; x < g->width; x++)
+        {
+            cur = g->nodes + (y * g->width + x);
+            cur->weight = INFINITY;
+            cur->state = UNSEEN;
+            if (map_get_floor(map, x, y) == 2)
+                cur->state = DONE;
+        }
+    }
+}
+
+struct coord2_t *graph_create(struct map *map)
+{
+    struct coord2_t *path = malloc(map->height * map->width);
+    if (path == NULL)
+        return NULL;
+
+    struct graph_t g;
+    g.width = map->width;
+    g.height = map->height;
+    g.nodes = malloc(map->width * map->height * sizeof(struct node_t));
+    if (g.nodes == NULL)
+        return NULL;
+
+    int start_x = map_get_start_x(map);
+    int start_y = map_get_start_y(map);
+    int finish_x = map_get_finish_x(map);
+    int finish_y = map_get_finish_y(map);
+    int x_nb;
+    int y_nb;
+    int move;
+    graph_init(&g, map);
+    struct node_t *cur = g.nodes + (start_y * g.width + start_x);
+    cur->coord.x = start_x;
+    cur->coord.y = start_y;
+    cur->weight = 0;
+    while (cur->coord.x != finish_x && cur->coord.y != finish_y)
+    {
+        move = 0;
+        cur->state = DONE;
+        for (int i = 0; i < 4; i++)
+        {
+            x_nb = cur->coord.x + neighbors[i].x;
+            y_nb = cur->coord.y + neighbors[i].y;
+            cur->nb[i] = g.nodes + (y_nb * g.width + x_nb);
+            cur->nb[i]->coord.x = x_nb;
+            cur->nb[i]->coord.y = y_nb;
+            if (cur->weight + 1 < cur->nb[i]->weight
+                && cur->nb[i]->weight != INFINITY)
+                cur->nb[i]->weight = cur->weight + 1;
+        }
+
+        /*for (int j = 0; j < 4; j++)
+        {
+            struct node_t *tmp = g.nodes + (start_y * g.width + start_x);
+            if (tmp->nb[j]->state == UNSEEN)
+            {
+                cur = tmp->nb[j];
+                move = 1;
+                break;
+            }
+        }*/
+
+        if (move == 1)
+            continue;
+        else if (map_get_floor(map, cur->coord.x, cur->coord.y - 1) != 2
+            && cur->nb[0]->state == UNSEEN)
+            cur = cur->nb[0];
+        else if (map_get_floor(map, cur->coord.x - 1, cur->coord.y) != 2
+            && cur->nb[1]->state == UNSEEN)
+            cur = cur->nb[1];
+        else if (map_get_floor(map, cur->coord.x + 1, cur->coord.y) != 2
+            && cur->nb[2]->state == UNSEEN)
+            cur = cur->nb[2];
+        else if (map_get_floor(map, cur->coord.x, cur->coord.y + 1) != 2
+            && cur->nb[3]->state == UNSEEN)
+            cur = cur->nb[3];
+    }
+    int index_path = 0;
+    while (cur->coord.x != start_x && cur->coord.y != start_y)
+    {
+        path[index_path] = cur->coord;
+        float min = cur->nb[0]->weight;
+        int index = 0;
+        for (int k = 0; k < 4; k++)
+        {
+            if (cur->nb[k]->weight < min)
+            {
+                min = cur->nb[k]->weight;
+                index = k;
+            }
+        }
+        cur = cur->nb[index];
+        index_path++;
+    }
+    path[index_path] = cur->coord;
+    path[index_path + 1].x = INT_MAX;
+    path[index_path + 1].y = INT_MAX;
+
+    /*for (int y = 0; y < map->height; y++)
+    {
+        for (int x = 0; x < map->width; x++)
         {
             cur->label = 0;
             cur->state = UNSEEN;
@@ -37,8 +130,9 @@ struct graph_t graph_create(int width, int height)
                 cur->weights[i] = INFINITY;
             cur++;
         }
-    }
-    return g;
+    }*/
+
+    return path;
 }
 
 void graph_destroy(struct graph_t *g)
@@ -46,28 +140,20 @@ void graph_destroy(struct graph_t *g)
     free(g->nodes);
 }
 
-/*
-void graph_print(struct graph_t *g, struct coord2_t pos)
+void print_path(struct coord2_t *path)
 {
-    struct node_t *cur = g->nodes + (pos.y * g->width + pos.x);
-    if (cur->state == DONE)
-        return;
-
-    cur->state = DONE;
-
-    for (int i = 0; i < 7; i++)
+    int i = 0;
+    while (path[i].x != INT_MAX && path[i].y != INT_MAX)
     {
-        if (cur->weights[i] == INFINITY)
-            continue;
-        printf("%f\n", cur->weights[i]);
-        struct coord2_t neighbor = {pos.x + neighbors[i].x, pos.y + neighbors[i].y};
-        graph_print(g, neighbor);
-    };
-}*/
-
+        printf("tile %d x: %d\n", i, path[i].x);
+        printf("tile %d y: %d\n", i, path[i].y);
+        i++;
+    }
+}
+/*
 struct graph_t *graph_create2(struct graph_t *g, struct map *map)
 {
-    struct node_t *cur;
+    struct node_t *cur = g->nodes;
     struct node_t *nb;
     int x_nb;
     int y_nb;
@@ -84,7 +170,23 @@ struct graph_t *graph_create2(struct graph_t *g, struct map *map)
                 cur->label = 'b';
             else if (map_get_floor(map, x, y) == 3)
                 cur->label = 'f';
+            cur++;
+        }
+    }
+    return g;
+}
 
+struct graph_t *graph_create3(struct graph_t *g, struct map *map)
+{
+    struct node_t *cur = g->nodes;
+    struct node_t *nb;
+    int x_nb;
+    int y_nb;
+    enum floortype floor_nb;
+    for (int y = 0; y < map->height; y++)
+    {
+        for (int x = 0; x < map->width; x++)
+        {
             if (cur->label == 'r')
             {
                 for (int i = 0; i < 7; i++)
@@ -92,19 +194,20 @@ struct graph_t *graph_create2(struct graph_t *g, struct map *map)
                     x_nb = x + neighbors[i].x;
                     y_nb = y + neighbors[i].y;
                     nb = g->nodes + (y_nb * g->width + x_nb);
-                    if (map_get_floor(map, x_nb, y_nb) == 0)
+                    floor_nb = map_get_floor(map, x_nb, y_nb);
+                    if (floor_nb == 0)
                     {
                         nb->label = 'r';
                         cur->weights[i] = 1.0f;
                     }
-                    else if (map_get_floor(map, x_nb, y_nb) == 1)
+                    else if (floor_nb == 1)
                     {
                         nb->label = 'g';
                         cur->weights[i] = 2.0f;
                     }
-                    else if (map_get_floor(map, x_nb, y_nb) == 2)
+                    else if (floor_nb == 2)
                         nb->label = 'b';
-                    else if (map_get_floor(map, x_nb, y_nb) == 3)
+                    else if (floor_nb == 3)
                     {
                         nb->label = 'f';
                         cur->weights[i] = 0.01f;
@@ -117,27 +220,29 @@ struct graph_t *graph_create2(struct graph_t *g, struct map *map)
                 {
                     x_nb = x + neighbors[j].x;
                     y_nb = y + neighbors[j].y;
-                    nb = g->nodes + (y_nb * g->width + y_nb);
-                    if (map_get_floor(map, x_nb, y_nb) == 0)
+                    nb = g->nodes + (y_nb * g->width + x_nb);
+                    floor_nb = map_get_floor(map, x_nb, y_nb);
+                    if (floor_nb == 0)
                     {
                         nb->label = 'r';
                         cur->weights[j] = 1.0f;
                     }
-                    else if (map_get_floor(map, x_nb, y_nb) == 1)
+                    else if (floor_nb == 1)
                     {
                         nb->label = 'g';
                         cur->weights[j] = 2.0f;
                     }
-                    else if (map_get_floor(map, x_nb, y_nb) == 2)
+                    else if (floor_nb == 2)
                         nb->label = 'b';
-                    else if (map_get_floor(map, x_nb, y_nb) == 3)
+                    else if (floor_nb == 3)
                     {
                         nb->label = 'f';
                         cur->weights[j] = 0.01f;
                     }
                 }
             }
+            cur++;
         }
     }
     return g;
-}
+}*/

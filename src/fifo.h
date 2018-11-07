@@ -19,6 +19,6 @@ struct fifo *fifo_init(void);
 void fifo_enqueue(struct fifo *f, struct node_t *node);
 struct node_t *fifo_dequeue(struct fifo *f);
 size_t fifo_empty(struct fifo *f);
-void bfs(struct node_t *node, struct graph_t *g);
+//void bfs(struct node_t *node, struct graph_t *g);
 
 #endif /* ! FIFO_H_ */

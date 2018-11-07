@@ -16,9 +16,10 @@ struct coord2_t
 
 struct node_t
 {
-    char label;
+    //char label;
     struct coord2_t coord;
-    float weights[8];
+    float weight;
+    struct node_t *nb[4];
     enum marked state;
 };
 
@@ -29,9 +30,11 @@ struct graph_t
     int height;
 };
 
-struct graph_t graph_create(int width, int height);
+void graph_init(struct graph_t *g, struct map *map);
+struct coord2_t *graph_create(struct map *map);
 void graph_destroy(struct graph_t *g);
-//void graph_print(struct graph_t *g, struct coord2_t pos);
-struct graph_t *graph_create2(struct graph_t *g, struct map *map);
+void print_path(struct coord2_t *path);
+//struct graph_t *graph_create2(struct graph_t *g, struct map *map);
+//struct graph_t *graph_create3(struct graph_t *g, struct map *map);
 
 #endif /* ! GRAPH_H_ */
