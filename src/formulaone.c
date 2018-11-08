@@ -2,7 +2,6 @@
 #include <math.h>
 #include <limits.h>
 #include "control.h"
-//#include "fifo.h"
 #include "graph.h"
 #include "parse_map.h"
 
@@ -16,7 +15,8 @@ enum move update(struct car *car)
     float finish_x = map_get_finish_x(car->map);
     float finish_y = map_get_finish_y(car->map);
 
-    struct coord2_t *path = graph_create(car->map);
+    struct coord2_t *path = find_path(car->map, start_x, start_y, finish_x,
+        finish_y);
     /*int i = 0;
     while (path[i].x != INT_MAX && path[i].y != INT_MAX)
     {
@@ -25,12 +25,12 @@ enum move update(struct car *car)
     }*/
     print_path(path);
 
-    printf("start x: %f\n", start_x);
-    printf("start y: %f\n\n", start_y);
-    printf("position x: %f\n", car->position.x);
-    printf("position y: %f\n\n", car->position.y);
-    printf("direction x: %f\n", car->direction.x);
-    printf("direction y: %f\n\n", car->direction.y);
+    //printf("start x: %f\n", start_x);
+    //printf("start y: %f\n\n", start_y);
+    //printf("position x: %f\n", car->position.x);
+    //printf("position y: %f\n\n", car->position.y);
+    //printf("direction x: %f\n", car->direction.x);
+    //printf("direction y: %f\n\n", car->direction.y);
 
     float SF_x = fabsf(finish_x - start_x); //abscisse start-finish
     float SF_y = fabsf(finish_y - start_y); //ordonnée start-finish
@@ -51,17 +51,17 @@ enum move update(struct car *car)
 
     float angle_diff = angle_trajectory - angle_deg;
 
-    printf("angle deg: %f\n", angle_deg);
-    printf("angle diff: %f\n\n", angle_diff);
+    //printf("angle deg: %f\n", angle_deg);
+    //printf("angle diff: %f\n\n", angle_diff);
     printf("speed: %f\n\n", speed);
     printf("acceleration: %f\n\n", acceleration);
 
-    enum floortype floor =
-        map_get_floor(car->map, (int)car->position.x, (int)car->position.y);
+    /*enum floortype floor =
+        map_get_floor(car->map, car->position.x, car->position.y);
     printf("floor: %x\n\n", floor);
     printf("finish x: %f\n", finish_x);
     printf("finish y: %f\n\n", finish_y);
-    printf("-----------------\n\n");
+    printf("-----------------\n\n");*/
 
     if (angle_diff > 0.4f)
         return TURN_RIGHT;

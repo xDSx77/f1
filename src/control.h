@@ -87,4 +87,4 @@ struct vector2 *vector2_new(void);
 struct vector2 *vector2_clone(struct vector2 *vector);
 void vector2_delete(struct vector2 *vector);
 
-#endif /* CONTROL_H_ */
+#endif /* ! CONTROL_H_ */
